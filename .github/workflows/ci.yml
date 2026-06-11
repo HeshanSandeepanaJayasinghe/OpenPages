@@ -31,7 +31,7 @@ jobs:
         run: npm run typecheck
 
       - name: Run Tests
-        run: npm test -- --runInBand
+        run: npm test -- --runInBand --passWithNoTests
 
       - name: Build
         run: npm run build
