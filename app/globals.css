@@ -1,26 +1,106 @@
+@import url("https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap");
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #faf6f0;
+  --background-paper: #fcfbf9;
+  --background-paper-dark: #f3edd7;
+  --foreground: #1e1e1e;
+  --accent: #8b2626; /* Sealing Wax Red */
+  --accent-hover: #6b1a1a;
+  --ink-blue: #1c3d5a; /* Fountain Pen Blue */
+  --ink-gray: #5c5850; /* Graphite */
+  --border-paper: #e7dfd1;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-paper: var(--background-paper);
+  --color-paper-dark: var(--background-paper-dark);
+  --color-ink: var(--foreground);
+  --color-ink-blue: var(--ink-blue);
+  --color-ink-gray: var(--ink-gray);
+  --color-accent-ink: var(--accent);
+  --color-paper-border: var(--border-paper);
+  
+  --font-sans: "Plus Jakarta Sans", var(--font-geist-sans), sans-serif;
+  --font-serif: "Lora", Georgia, serif;
+  --font-display: "Playfair Display", serif;
+  
+  --shadow-paper: 0 4px 20px -2px rgba(139, 126, 107, 0.15), 0 2px 6px -1px rgba(139, 126, 107, 0.1);
+  --shadow-paper-lg: 0 10px 30px -5px rgba(139, 126, 107, 0.2), 0 4px 12px -2px rgba(139, 126, 107, 0.15);
+  --shadow-paper-stacked: 0 1px 1px rgba(0,0,0,0.1), 0 4px 0 -2px var(--background-paper), 0 4px 1px -1px var(--border-paper), 0 8px 0 -4px var(--background-paper), 0 8px 1px -3px var(--border-paper);
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  background-image: 
+    radial-gradient(rgba(139, 126, 107, 0.03) 1px, transparent 0),
+    radial-gradient(rgba(139, 126, 107, 0.03) 1px, transparent 0);
+  background-size: 24px 24px;
+  background-position: 0 0, 12px 12px;
+}
+
+/* Paper page transitions and details */
+.paper-sheet {
+  background-color: var(--background-paper);
+  border: 1px solid var(--border-paper);
+  box-shadow: var(--shadow-paper);
+  position: relative;
+}
+
+.paper-sheet::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: repeating-linear-gradient(90deg, var(--accent) 0px, var(--accent) 15px, transparent 15px, transparent 30px);
+  opacity: 0.15;
+}
+
+.paper-card {
+  background-color: var(--background-paper);
+  border: 1px solid var(--border-paper);
+  box-shadow: var(--shadow-paper);
+  transition: all 0.3s ease;
+}
+
+.paper-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-paper-lg);
+}
+
+/* Deckle edge or rough paper divider */
+.deckle-edge {
+  background-image: linear-gradient(135deg, var(--border-paper) 25%, transparent 25%), 
+                    linear-gradient(225deg, var(--border-paper) 25%, transparent 25%);
+  background-position: 0 0;
+  background-size: 8px 8px;
+  height: 4px;
+  width: 100%;
+}
+
+.book-title {
+  font-family: "Playfair Display", serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.book-body {
+  font-family: "Lora", serif;
+  line-height: 1.75;
+}
+
+/* Print/Book layout margins */
+.book-container {
+  max-width: 52rem; /* 832px */
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 2rem;
+  padding-right: 2rem;
 }

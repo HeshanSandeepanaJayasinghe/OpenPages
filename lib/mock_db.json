@@ -1,0 +1,85 @@
+{
+  "profiles": [
+    {
+      "id": "admin-uuid-1111-2222-333333333333",
+      "name": "Arthur Pendelton (Admin)",
+      "email": "admin@openpages.com",
+      "avatar_url": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150",
+      "role": "admin",
+      "created_at": "2026-06-01T08:00:00.000Z"
+    },
+    {
+      "id": "writer-uuid-1111-2222-333333333333",
+      "name": "Clara Inkwell (Writer)",
+      "email": "writer@openpages.com",
+      "avatar_url": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150",
+      "role": "writer",
+      "created_at": "2026-06-02T10:00:00.000Z"
+    },
+    {
+      "id": "writer2-uuid-1111-2222-333333333333",
+      "name": "Homer Page (Writer)",
+      "email": "writer2@openpages.com",
+      "avatar_url": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
+      "role": "writer",
+      "created_at": "2026-06-03T14:30:00.000Z"
+    }
+  ],
+  "pages": [
+    {
+      "id": "page-uuid-1111-2222-333333333333",
+      "author_id": "writer-uuid-1111-2222-333333333333",
+      "title": "Why Paper Matters in a Digital Age",
+      "content": "There is an unspoken romance in the texture of a page. Unlike the glowing, clinical screen of a smartphone, a page does not request your attention with notifications or pop-ups. It is static, patient, and quiet. In our rush to digitize everything, we have traded the tactile intimacy of books for the cold efficiency of digital pixels. Reading from paper invites contemplation; it slower, more focused, and ultimately deeper. When we touch paper, we touch history, craft, and a slower way of being.",
+      "cover_image": "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=800",
+      "status": "published",
+      "created_at": "2026-06-05T09:00:00.000Z",
+      "updated_at": "2026-06-05T09:00:00.000Z"
+    },
+    {
+      "id": "page-uuid-2222-3333-444444444444",
+      "author_id": "writer2-uuid-1111-2222-333333333333",
+      "title": "Borges and the Infinite Library",
+      "content": "Jorge Luis Borges once envisioned the universe as an infinite library—the Library of Babel—containing every possible combination of letters. While it contains all truths, it also contains all lies, gibberish, and nonsense. Our modern internet feels remarkably similar. The challenge of our time is not the acquisition of information, but the navigation of it. We must find the 'catalog' to our own infinite libraries, filtering out the noise to hold on to the rare, brilliant volumes of human insight.",
+      "cover_image": "https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=800",
+      "status": "published",
+      "created_at": "2026-06-10T11:15:00.000Z",
+      "updated_at": "2026-06-10T11:15:00.000Z"
+    },
+    {
+      "id": "page-uuid-3333-4444-555555555555",
+      "author_id": "writer-uuid-1111-2222-333333333333",
+      "title": "Pencil Markings and Marginalia (Draft)",
+      "content": "This is a draft about marginalia—the custom of writing notes, thoughts, and critiques in the margins of library books. It is a dialogue between the reader and the author across centuries. More thoughts to follow on this soon...",
+      "cover_image": "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800",
+      "status": "draft",
+      "created_at": "2026-06-20T16:45:00.000Z",
+      "updated_at": "2026-06-20T16:45:00.000Z"
+    }
+  ],
+  "comments": [
+    {
+      "id": "comment-uuid-1111-2222-333333333333",
+      "page_id": "page-uuid-1111-2222-333333333333",
+      "user_id": "writer2-uuid-1111-2222-333333333333",
+      "content": "This resonates deeply. Holding a physical book slows down my breathing, whereas reading on a screen makes me scan impatiently.",
+      "created_at": "2026-06-06T10:30:00.000Z"
+    },
+    {
+      "id": "comment-uuid-2222-3333-444444444444",
+      "page_id": "page-uuid-1111-2222-333333333333",
+      "user_id": "admin-uuid-1111-2222-333333333333",
+      "content": "Excellent mini-essay, Clara. It captures the exact spirit of why we created OpenPages—to slow down and savor human thoughts.",
+      "created_at": "2026-06-07T12:00:00.000Z"
+    }
+  ],
+  "moderation_logs": [
+    {
+      "id": "mod-log-1",
+      "target_type": "comment",
+      "target_id": "comment-uuid-1111-2222",
+      "moderation_result": "Clean",
+      "created_at": "2026-06-06T10:30:00.000Z"
+    }
+  ]
+}
