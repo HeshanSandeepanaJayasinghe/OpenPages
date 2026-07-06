@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth";
-import { BookOpen, User, LogOut, Shield, Feather, Settings, HelpCircle, Database, DatabaseZap } from "lucide-react";
+import { BookOpen, User, LogOut, Shield, Feather, Settings, Database, DatabaseZap } from "lucide-react";
 
 export function Header() {
   const { user, logout, isLive } = useAuth();

@@ -35,8 +35,8 @@ export default function Login() {
     setIsSubmitting(true);
     try {
       await login(email, password);
-    } catch (err: any) {
-      setError(err?.message || "Login failed. Please check your credentials.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Login failed. Please check your credentials.");
     } finally {
       setIsSubmitting(false);
     }
@@ -49,8 +49,8 @@ export default function Login() {
     const demoPassword = role === "admin" ? "admin123" : "writer123";
     try {
       await login(demoEmail, demoPassword);
-    } catch (err: any) {
-      setError(err?.message || `Failed to log in as demo ${role}.`);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : `Failed to log in as demo ${role}.`);
     } finally {
       setIsSubmitting(false);
     }

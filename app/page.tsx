@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { actionGetPages } from "@/app/actions/dbActions";
-import { Book, Feather, ArrowRight, MessageSquare, Quote, Eye } from "lucide-react";
+import { Feather, ArrowRight, Quote } from "lucide-react";
 
 export default async function Home() {
   const allPages = await actionGetPages();

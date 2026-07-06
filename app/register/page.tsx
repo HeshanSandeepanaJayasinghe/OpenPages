@@ -49,8 +49,8 @@ export default function Register() {
     setIsSubmitting(true);
     try {
       await register(name, email, role, password);
-    } catch (err: any) {
-      setError(err?.message || "Registration failed. Email might already be taken.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Registration failed. Email might already be taken.");
     } finally {
       setIsSubmitting(false);
     }

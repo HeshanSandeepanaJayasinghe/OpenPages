@@ -117,7 +117,7 @@ export async function POST(request: Request) {
     }
 
     const moderationResult = flagged 
-      ? `Flagged categories: ${Object.entries(categories).filter(([_, val]) => val).map(([name]) => name).join(", ")}`
+      ? `Flagged categories: ${Object.entries(categories).filter(([, val]) => val).map(([name]) => name).join(", ")}`
       : "Clean";
 
     // Write to moderation logs
