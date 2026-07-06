@@ -177,223 +177,281 @@ function writeMockDb(data: MockDataSchema) {
   }
 }
 
+// Helper to perform safe database calls with local mock database fallback
+async function safeDbCall<T>(call: () => Promise<T>, fallback: () => T | Promise<T>): Promise<T> {
+  if (isLiveDb && supabase) {
+    try {
+      return await call();
+    } catch (err) {
+      console.warn("Supabase query failed, falling back to mock database:", err);
+      return await fallback();
+    }
+  }
+  return await fallback();
+}
+
 // Global Database API wrapper functions (Server-side)
 
 export async function getProfiles(): Promise<Profile[]> {
-  if (isLiveDb && supabase) {
-    const { data, error } = await supabase.from("profiles").select("*");
-    if (error) throw error;
-    return data || [];
-  } else {
-    return readMockDb().profiles;
-  }
+  return safeDbCall(
+    async () => {
+      const { data, error } = await supabase!.from("profiles").select("*");
+      if (error) throw error;
+      return data || [];
+    },
+    () => readMockDb().profiles
+  );
 }
 
 export async function getProfileById(id: string): Promise<Profile | null> {
-  if (isLiveDb && supabase) {
-    const { data, error } = await supabase.from("profiles").select("*").eq("id", id).maybeSingle();
-    if (error) throw error;
-    return data;
-  } else {
-    const db = readMockDb();
-    return db.profiles.find((p) => p.id === id) || null;
-  }
+  return safeDbCall(
+    async () => {
+      const { data, error } = await supabase!.from("profiles").select("*").eq("id", id).maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    () => {
+      const db = readMockDb();
+      return db.profiles.find((p) => p.id === id) || null;
+    }
+  );
 }
 
 export async function getProfileByEmail(email: string): Promise<Profile | null> {
-  if (isLiveDb && supabase) {
-    const { data, error } = await supabase.from("profiles").select("*").eq("email", email).maybeSingle();
-    if (error) throw error;
-    return data;
-  } else {
-    const db = readMockDb();
-    return db.profiles.find((p) => p.email.toLowerCase() === email.toLowerCase()) || null;
-  }
+  return safeDbCall(
+    async () => {
+      const { data, error } = await supabase!.from("profiles").select("*").eq("email", email).maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    () => {
+      const db = readMockDb();
+      return db.profiles.find((p) => p.email.toLowerCase() === email.toLowerCase()) || null;
+    }
+  );
 }
 
 export async function createProfile(profile: Profile): Promise<Profile> {
-  if (isLiveDb && supabase) {
-    const { data, error } = await supabase.from("profiles").insert(profile).select().single();
-    if (error) throw error;
-    return data;
-  } else {
-    const db = readMockDb();
-    if (db.profiles.some((p) => p.id === profile.id || p.email.toLowerCase() === profile.email.toLowerCase())) {
-      throw new Error("Profile already exists with this ID or email.");
+  return safeDbCall(
+    async () => {
+      const { data, error } = await supabase!.from("profiles").insert(profile).select().single();
+      if (error) throw error;
+      return data;
+    },
+    async () => {
+      const db = readMockDb();
+      if (db.profiles.some((p) => p.id === profile.id || p.email.toLowerCase() === profile.email.toLowerCase())) {
+        throw new Error("Profile already exists with this ID or email.");
+      }
+      db.profiles.push(profile);
+      writeMockDb(db);
+      return profile;
     }
-    db.profiles.push(profile);
-    writeMockDb(db);
-    return profile;
-  }
+  );
 }
 
 export async function updateProfile(id: string, updates: Partial<Profile>): Promise<Profile> {
-  if (isLiveDb && supabase) {
-    const { data, error } = await supabase.from("profiles").update(updates).eq("id", id).select().single();
-    if (error) throw error;
-    return data;
-  } else {
-    const db = readMockDb();
-    const idx = db.profiles.findIndex((p) => p.id === id);
-    if (idx === -1) throw new Error("Profile not found");
-    db.profiles[idx] = { ...db.profiles[idx], ...updates };
-    writeMockDb(db);
-    return db.profiles[idx];
-  }
+  return safeDbCall(
+    async () => {
+      const { data, error } = await supabase!.from("profiles").update(updates).eq("id", id).select().single();
+      if (error) throw error;
+      return data;
+    },
+    async () => {
+      const db = readMockDb();
+      const idx = db.profiles.findIndex((p) => p.id === id);
+      if (idx === -1) throw new Error("Profile not found");
+      db.profiles[idx] = { ...db.profiles[idx], ...updates };
+      writeMockDb(db);
+      return db.profiles[idx];
+    }
+  );
 }
 
 export async function deleteProfile(id: string): Promise<boolean> {
-  if (isLiveDb && supabase) {
-    const { error } = await supabase.from("profiles").delete().eq("id", id);
-    if (error) throw error;
-    return true;
-  } else {
-    const db = readMockDb();
-    const lenBefore = db.profiles.length;
-    db.profiles = db.profiles.filter((p) => p.id !== id);
-    writeMockDb(db);
-    return db.profiles.length < lenBefore;
-  }
+  return safeDbCall(
+    async () => {
+      const { error } = await supabase!.from("profiles").delete().eq("id", id);
+      if (error) throw error;
+      return true;
+    },
+    async () => {
+      const db = readMockDb();
+      const lenBefore = db.profiles.length;
+      db.profiles = db.profiles.filter((p) => p.id !== id);
+      writeMockDb(db);
+      return db.profiles.length < lenBefore;
+    }
+  );
 }
 
 // Pages CRUD
 export async function getPages(): Promise<Page[]> {
-  if (isLiveDb && supabase) {
-    const { data, error } = await supabase.from("pages").select("*").order("created_at", { ascending: false });
-    if (error) throw error;
-    return data || [];
-  } else {
-    return [...readMockDb().pages].sort(
-      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-    );
-  }
+  return safeDbCall(
+    async () => {
+      const { data, error } = await supabase!.from("pages").select("*").order("created_at", { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+    () => {
+      return [...readMockDb().pages].sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+    }
+  );
 }
 
 export async function getPageById(id: string): Promise<Page | null> {
-  if (isLiveDb && supabase) {
-    const { data, error } = await supabase.from("pages").select("*").eq("id", id).maybeSingle();
-    if (error) throw error;
-    return data;
-  } else {
-    const db = readMockDb();
-    return db.pages.find((p) => p.id === id) || null;
-  }
+  return safeDbCall(
+    async () => {
+      const { data, error } = await supabase!.from("pages").select("*").eq("id", id).maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    () => {
+      const db = readMockDb();
+      return db.pages.find((p) => p.id === id) || null;
+    }
+  );
 }
 
 export async function createPage(page: Page): Promise<Page> {
-  if (isLiveDb && supabase) {
-    const { data, error } = await supabase.from("pages").insert(page).select().single();
-    if (error) throw error;
-    return data;
-  } else {
-    const db = readMockDb();
-    db.pages.push(page);
-    writeMockDb(db);
-    return page;
-  }
+  return safeDbCall(
+    async () => {
+      const { data, error } = await supabase!.from("pages").insert(page).select().single();
+      if (error) throw error;
+      return data;
+    },
+    async () => {
+      const db = readMockDb();
+      db.pages.push(page);
+      writeMockDb(db);
+      return page;
+    }
+  );
 }
 
 export async function updatePage(id: string, updates: Partial<Page>): Promise<Page> {
-  if (isLiveDb && supabase) {
-    const { data, error } = await supabase.from("pages").update(updates).eq("id", id).select().single();
-    if (error) throw error;
-    return data;
-  } else {
-    const db = readMockDb();
-    const idx = db.pages.findIndex((p) => p.id === id);
-    if (idx === -1) throw new Error("Page not found");
-    db.pages[idx] = { ...db.pages[idx], ...updates, updated_at: new Date().toISOString() };
-    writeMockDb(db);
-    return db.pages[idx];
-  }
+  return safeDbCall(
+    async () => {
+      const { data, error } = await supabase!.from("pages").update(updates).eq("id", id).select().single();
+      if (error) throw error;
+      return data;
+    },
+    async () => {
+      const db = readMockDb();
+      const idx = db.pages.findIndex((p) => p.id === id);
+      if (idx === -1) throw new Error("Page not found");
+      db.pages[idx] = { ...db.pages[idx], ...updates, updated_at: new Date().toISOString() };
+      writeMockDb(db);
+      return db.pages[idx];
+    }
+  );
 }
 
 export async function deletePage(id: string): Promise<boolean> {
-  if (isLiveDb && supabase) {
-    const { error } = await supabase.from("pages").delete().eq("id", id);
-    if (error) throw error;
-    return true;
-  } else {
-    const db = readMockDb();
-    const lenBefore = db.pages.length;
-    db.pages = db.pages.filter((p) => p.id !== id);
-    // Also delete comments associated with it
-    db.comments = db.comments.filter((c) => c.page_id !== id);
-    writeMockDb(db);
-    return db.pages.length < lenBefore;
-  }
+  return safeDbCall(
+    async () => {
+      const { error } = await supabase!.from("pages").delete().eq("id", id);
+      if (error) throw error;
+      return true;
+    },
+    async () => {
+      const db = readMockDb();
+      const lenBefore = db.pages.length;
+      db.pages = db.pages.filter((p) => p.id !== id);
+      db.comments = db.comments.filter((c) => c.page_id !== id);
+      writeMockDb(db);
+      return db.pages.length < lenBefore;
+    }
+  );
 }
 
 // Comments CRUD
 export async function getComments(pageId?: string): Promise<Comment[]> {
-  if (isLiveDb && supabase) {
-    let query = supabase.from("comments").select("*").order("created_at", { ascending: true });
-    if (pageId) {
-      query = query.eq("page_id", pageId);
+  return safeDbCall(
+    async () => {
+      let query = supabase!.from("comments").select("*").order("created_at", { ascending: true });
+      if (pageId) {
+        query = query.eq("page_id", pageId);
+      }
+      const { data, error } = await query;
+      if (error) throw error;
+      return data || [];
+    },
+    () => {
+      let list = readMockDb().comments;
+      if (pageId) {
+        list = list.filter((c) => c.page_id === pageId);
+      }
+      return [...list].sort(
+        (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+      );
     }
-    const { data, error } = await query;
-    if (error) throw error;
-    return data || [];
-  } else {
-    let list = readMockDb().comments;
-    if (pageId) {
-      list = list.filter((c) => c.page_id === pageId);
-    }
-    return [...list].sort(
-      (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-    );
-  }
+  );
 }
 
 export async function createComment(comment: Comment): Promise<Comment> {
-  if (isLiveDb && supabase) {
-    const { data, error } = await supabase.from("comments").insert(comment).select().single();
-    if (error) throw error;
-    return data;
-  } else {
-    const db = readMockDb();
-    db.comments.push(comment);
-    writeMockDb(db);
-    return comment;
-  }
+  return safeDbCall(
+    async () => {
+      const { data, error } = await supabase!.from("comments").insert(comment).select().single();
+      if (error) throw error;
+      return data;
+    },
+    async () => {
+      const db = readMockDb();
+      db.comments.push(comment);
+      writeMockDb(db);
+      return comment;
+    }
+  );
 }
 
 export async function deleteComment(id: string): Promise<boolean> {
-  if (isLiveDb && supabase) {
-    const { error } = await supabase.from("comments").delete().eq("id", id);
-    if (error) throw error;
-    return true;
-  } else {
-    const db = readMockDb();
-    const lenBefore = db.comments.length;
-    db.comments = db.comments.filter((c) => c.id !== id);
-    writeMockDb(db);
-    return db.comments.length < lenBefore;
-  }
+  return safeDbCall(
+    async () => {
+      const { error } = await supabase!.from("comments").delete().eq("id", id);
+      if (error) throw error;
+      return true;
+    },
+    async () => {
+      const db = readMockDb();
+      const lenBefore = db.comments.length;
+      db.comments = db.comments.filter((c) => c.id !== id);
+      writeMockDb(db);
+      return db.comments.length < lenBefore;
+    }
+  );
 }
 
 // Moderation Logs CRUD
 export async function getModerationLogs(): Promise<ModerationLog[]> {
-  if (isLiveDb && supabase) {
-    const { data, error } = await supabase.from("moderation_logs").select("*").order("created_at", { ascending: false });
-    if (error) throw error;
-    return data || [];
-  } else {
-    return [...readMockDb().moderation_logs].sort(
-      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-    );
-  }
+  return safeDbCall(
+    async () => {
+      const { data, error } = await supabase!.from("moderation_logs").select("*").order("created_at", { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+    () => {
+      return [...readMockDb().moderation_logs].sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+    }
+  );
 }
 
 export async function createModerationLog(log: ModerationLog): Promise<ModerationLog> {
-  if (isLiveDb && supabase) {
-    const { data, error } = await supabase.from("moderation_logs").insert(log).select().single();
-    if (error) throw error;
-    return data;
-  } else {
-    const db = readMockDb();
-    db.moderation_logs.push(log);
-    writeMockDb(db);
-    return log;
-  }
+  return safeDbCall(
+    async () => {
+      const { data, error } = await supabase!.from("moderation_logs").insert(log).select().single();
+      if (error) throw error;
+      return data;
+    },
+    async () => {
+      const db = readMockDb();
+      db.moderation_logs.push(log);
+      writeMockDb(db);
+      return log;
+    }
+  );
 }

@@ -185,31 +185,78 @@ export function Header() {
           </div>
         </div>
         
-        {/* Mobile Navigation for Logged In User Specifics */}
-        {user && (
-          <div className="sm:hidden flex items-center justify-center gap-4 py-2 border-t border-paper-border text-[11px] font-semibold uppercase tracking-wider">
-            {user.role === "writer" && (
-              <>
-                <Link href="/myprofile" className={`flex items-center gap-1 ${isActive("/myprofile") ? "text-accent-ink" : "text-ink-gray"}`}>
-                  Profile
-                </Link>
-                <Link href="/mypage" className={`flex items-center gap-1 ${isActive("/mypage") ? "text-accent-ink" : "text-ink-gray"}`}>
-                  My Pages
-                </Link>
-              </>
-            )}
-            {user.role === "admin" && (
-              <>
-                <Link href="/stat" className={`flex items-center gap-1 ${isActive("/stat") ? "text-accent-ink" : "text-ink-gray"}`}>
-                  Stats
-                </Link>
-                <Link href="/management" className={`flex items-center gap-1 ${isActive("/management") ? "text-accent-ink" : "text-ink-gray"}`}>
-                  Management
-                </Link>
-              </>
-            )}
-          </div>
-        )}
+        {/* Mobile Navigation */}
+        <div className="md:hidden flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 py-2.5 border-t border-paper-border text-[11px] font-semibold uppercase tracking-wider">
+          <Link 
+            href="/" 
+            className={`flex items-center gap-1 ${
+              isActive("/") ? "text-accent-ink font-semibold" : "text-ink-gray hover:text-ink"
+            }`}
+          >
+            Home
+          </Link>
+          <Link 
+            href="/pages" 
+            className={`flex items-center gap-1 ${
+              isActive("/pages") || pathname?.startsWith("/pages/") ? "text-accent-ink font-semibold" : "text-ink-gray hover:text-ink"
+            }`}
+          >
+            Pages
+          </Link>
+          <Link 
+            href="/aboutus" 
+            className={`flex items-center gap-1 ${
+              isActive("/aboutus") ? "text-accent-ink font-semibold" : "text-ink-gray hover:text-ink"
+            }`}
+          >
+            About Us
+          </Link>
+          {user && (
+            <>
+              <div className="h-3 w-[1px] bg-paper-border"></div>
+              {user.role === "writer" && (
+                <>
+                  <Link 
+                    href="/myprofile" 
+                    className={`flex items-center gap-1 ${
+                      isActive("/myprofile") ? "text-accent-ink font-semibold" : "text-ink-gray hover:text-ink"
+                    }`}
+                  >
+                    Profile
+                  </Link>
+                  <Link 
+                    href="/mypage" 
+                    className={`flex items-center gap-1 ${
+                      isActive("/mypage") ? "text-accent-ink font-semibold" : "text-ink-gray hover:text-ink"
+                    }`}
+                  >
+                    My Pages
+                  </Link>
+                </>
+              )}
+              {user.role === "admin" && (
+                <>
+                  <Link 
+                    href="/stat" 
+                    className={`flex items-center gap-1 ${
+                      isActive("/stat") ? "text-accent-ink font-semibold" : "text-ink-gray hover:text-ink"
+                    }`}
+                  >
+                    Stats
+                  </Link>
+                  <Link 
+                    href="/management" 
+                    className={`flex items-center gap-1 ${
+                      isActive("/management") ? "text-accent-ink font-semibold" : "text-ink-gray hover:text-ink"
+                    }`}
+                  >
+                    Management
+                  </Link>
+                </>
+              )}
+            </>
+          )}
+        </div>
       </div>
     </header>
   );
