@@ -25,6 +25,8 @@ export interface Profile {
   avatar_url: string;
   role: "writer" | "admin";
   created_at: string;
+  bio?: string;
+  password?: string;
 }
 
 export interface Page {
@@ -69,6 +71,8 @@ const INITIAL_MOCK_DATA: MockDataSchema = {
       email: "admin@openpages.com",
       avatar_url: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150",
       role: "admin",
+      bio: "Head librarian and platform moderator.",
+      password: "admin123",
       created_at: new Date("2026-06-01T08:00:00Z").toISOString(),
     },
     {
@@ -77,6 +81,8 @@ const INITIAL_MOCK_DATA: MockDataSchema = {
       email: "writer@openpages.com",
       avatar_url: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150",
       role: "writer",
+      bio: "A passionate writer exploring the bounds of physical and digital print.",
+      password: "writer123",
       created_at: new Date("2026-06-02T10:00:00Z").toISOString(),
     },
     {
@@ -85,6 +91,8 @@ const INITIAL_MOCK_DATA: MockDataSchema = {
       email: "writer2@openpages.com",
       avatar_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
       role: "writer",
+      bio: "Savoring the quiet details of books and marginalia.",
+      password: "writer123",
       created_at: new Date("2026-06-03T14:30:00Z").toISOString(),
     },
   ],
@@ -279,6 +287,8 @@ export async function deleteProfile(id: string): Promise<boolean> {
       const db = readMockDb();
       const lenBefore = db.profiles.length;
       db.profiles = db.profiles.filter((p) => p.id !== id);
+      db.pages = db.pages.filter((p) => p.author_id !== id);
+      db.comments = db.comments.filter((c) => c.user_id !== id);
       writeMockDb(db);
       return db.profiles.length < lenBefore;
     }

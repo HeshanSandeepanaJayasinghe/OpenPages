@@ -30,11 +30,11 @@
       "id": "page-uuid-1111-2222-333333333333",
       "author_id": "writer-uuid-1111-2222-333333333333",
       "title": "Why Paper Matters in a Digital Age",
-      "content": "There is an unspoken romance in the texture of a page. Unlike the glowing, clinical screen of a smartphone, a page does not request your attention with notifications or pop-ups. It is static, patient, and quiet. In our rush to digitize everything, we have traded the tactile intimacy of books for the cold efficiency of digital pixels. Reading from paper invites contemplation; it slower, more focused, and ultimately deeper. When we touch paper, we touch history, craft, and a slower way of being.",
+      "content": "There is an unspoken romance in the texture of a page. Unlike the glowing, clinical screen of a smartphone, a page does not request your attention with notifications or pop-ups. It is static, patient, and quiet. In our rush to digitize everything, we have traded the tactile intimacy of books for the cold efficiency of digital pixels. Reading from paper invites contemplation; it slower, more focused, and ultimately deeper. When we touch paper, we touch history, craft, and a slower way of being.--test",
       "cover_image": "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=800",
       "status": "published",
       "created_at": "2026-06-05T09:00:00.000Z",
-      "updated_at": "2026-06-05T09:00:00.000Z"
+      "updated_at": "2026-07-08T17:00:25.840Z"
     },
     {
       "id": "page-uuid-2222-3333-444444444444",
