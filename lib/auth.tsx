@@ -152,13 +152,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           throw new Error("Invalid email or password");
         }
 
-        // Simulating password validation (any matching mock user accepts their demo password or writer123 / admin123)
+        const storedPassword = profile.password;
+        const isStoredPasswordMatch = storedPassword ? password === storedPassword : false;
         const isDemoAdmin = email === "admin@openpages.com" && password === "admin123";
         const isDemoWriter = email === "writer@openpages.com" && password === "writer123";
         const isDemoWriter2 = email === "writer2@openpages.com" && password === "writer123";
         const isDefaultTest = password === "password" || password === "writer123" || password === "admin123";
 
-        if (isDemoAdmin || isDemoWriter || isDemoWriter2 || isDefaultTest) {
+        if (isStoredPasswordMatch || isDemoAdmin || isDemoWriter || isDemoWriter2 || isDefaultTest) {
           const sessionUser: UserSession = {
             id: profile.id,
             name: profile.name,
@@ -233,6 +234,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           email,
           avatar_url: `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(name)}`,
           role,
+          password,
           created_at: new Date().toISOString(),
         });
 
@@ -266,7 +268,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const updateUser = async (updates: Partial<UserSession>): Promise<UserSession> => {
+  const updateUser = async (updates: Partial<UserSession> & { password?: string }): Promise<UserSession> => {
     if (!user) throw new Error("No authenticated user");
     
     // Create mapping to profile shape
@@ -274,6 +276,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       ...(updates.name && { name: updates.name }),
       ...(updates.avatar_url && { avatar_url: updates.avatar_url }),
       ...(updates.role && { role: updates.role }),
+      ...(updates.password !== undefined && { password: updates.password }),
     };
 
     const updatedProfile = await actionUpdateProfile(user.id, profileUpdates);
