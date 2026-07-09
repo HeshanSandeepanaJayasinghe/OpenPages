@@ -115,6 +115,17 @@ export function Header() {
                   {user.role === "admin" && (
                     <>
                       <Link 
+                        href="/myprofile" 
+                        className={`flex items-center gap-1.5 py-1 px-2.5 rounded border ${
+                          isActive("/myprofile") 
+                            ? "bg-accent-ink/5 border-accent-ink/20 text-accent-ink" 
+                            : "border-transparent text-ink-gray hover:text-ink hover:bg-black/5"
+                        }`}
+                      >
+                        <User size={13} />
+                        My Profile
+                      </Link>
+                      <Link 
                         href="/stat" 
                         className={`flex items-center gap-1.5 py-1 px-2.5 rounded border ${
                           isActive("/stat") 
@@ -236,6 +247,14 @@ export function Header() {
               )}
               {user.role === "admin" && (
                 <>
+                  <Link 
+                    href="/myprofile" 
+                    className={`flex items-center gap-1 ${
+                      isActive("/myprofile") ? "text-accent-ink font-semibold" : "text-ink-gray hover:text-ink"
+                    }`}
+                  >
+                    Profile
+                  </Link>
                   <Link 
                     href="/stat" 
                     className={`flex items-center gap-1 ${
