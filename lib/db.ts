@@ -26,6 +26,8 @@ export interface Profile {
   role: "writer" | "admin";
   password?: string;
   created_at: string;
+  bio?: string;
+  password?: string;
 }
 
 export interface Page {
@@ -70,6 +72,7 @@ const INITIAL_MOCK_DATA: MockDataSchema = {
       email: "admin@openpages.com",
       avatar_url: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150",
       role: "admin",
+      bio: "Head librarian and platform moderator.",
       password: "admin123",
       created_at: new Date("2026-06-01T08:00:00Z").toISOString(),
     },
@@ -283,6 +286,8 @@ export async function deleteProfile(id: string): Promise<boolean> {
       const db = readMockDb();
       const lenBefore = db.profiles.length;
       db.profiles = db.profiles.filter((p) => p.id !== id);
+      db.pages = db.pages.filter((p) => p.author_id !== id);
+      db.comments = db.comments.filter((c) => c.user_id !== id);
       writeMockDb(db);
       return db.profiles.length < lenBefore;
     }

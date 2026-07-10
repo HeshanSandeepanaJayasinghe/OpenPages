@@ -8,6 +8,7 @@ import {
   actionCreateProfile,
   actionGetProfileById,
   actionUpdateProfile,
+  actionDeleteProfile,
 } from "@/app/actions/dbActions";
 
 export interface UserSession {
@@ -16,6 +17,7 @@ export interface UserSession {
   email: string;
   avatar_url: string;
   role: "writer" | "admin";
+  bio?: string;
 }
 
 interface AuthContextType {
@@ -25,7 +27,8 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<UserSession>;
   register: (name: string, email: string, role: "writer" | "admin", password: string) => Promise<UserSession>;
   logout: () => Promise<void>;
-  updateUser: (updates: Partial<UserSession>) => Promise<UserSession>;
+  updateUser: (updates: Partial<UserSession & { password?: string }>) => Promise<UserSession>;
+  deleteAccount: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -66,6 +69,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 email: profile.email,
                 avatar_url: profile.avatar_url,
                 role: profile.role,
+                bio: profile.bio || "",
               });
             }
           }
@@ -82,6 +86,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     email: profile.email,
                     avatar_url: profile.avatar_url,
                     role: profile.role,
+                    bio: profile.bio || "",
                   });
                 }
               } else {
@@ -106,6 +111,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 email: profile.email,
                 avatar_url: profile.avatar_url,
                 role: profile.role,
+                bio: profile.bio || "",
               });
             } else {
               localStorage.removeItem("openpages_session_user_id");
@@ -142,6 +148,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           email: profile.email,
           avatar_url: profile.avatar_url,
           role: profile.role,
+          bio: profile.bio || "",
         };
         setUser(sessionUser);
         return sessionUser;
@@ -158,14 +165,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const isDemoWriter = email === "writer@openpages.com" && password === "writer123";
         const isDemoWriter2 = email === "writer2@openpages.com" && password === "writer123";
         const isDefaultTest = password === "password" || password === "writer123" || password === "admin123";
+        
+        const hasMatchingPassword = profile.password ? profile.password === password : (isDemoAdmin || isDemoWriter || isDemoWriter2 || isDefaultTest);
 
-        if (isStoredPasswordMatch || isDemoAdmin || isDemoWriter || isDemoWriter2 || isDefaultTest) {
+        if (hasMatchingPassword) {
           const sessionUser: UserSession = {
             id: profile.id,
             name: profile.name,
             email: profile.email,
             avatar_url: profile.avatar_url,
             role: profile.role,
+            bio: profile.bio || "",
           };
           localStorage.setItem("openpages_session_user_id", profile.id);
           setUser(sessionUser);
@@ -209,6 +219,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           avatar_url: `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(name)}`,
           role,
           created_at: new Date().toISOString(),
+          bio: "",
         });
 
         const sessionUser: UserSession = {
@@ -217,6 +228,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           email: profile.email,
           avatar_url: profile.avatar_url,
           role: profile.role,
+          bio: "",
         };
         setUser(sessionUser);
         return sessionUser;
@@ -236,6 +248,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           role,
           password,
           created_at: new Date().toISOString(),
+          bio: "",
+          password,
         });
 
         const sessionUser: UserSession = {
@@ -244,6 +258,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           email: profile.email,
           avatar_url: profile.avatar_url,
           role: profile.role,
+          bio: "",
         };
         localStorage.setItem("openpages_session_user_id", profile.id);
         setUser(sessionUser);
@@ -268,7 +283,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const updateUser = async (updates: Partial<UserSession> & { password?: string }): Promise<UserSession> => {
+  const updateUser = async (updates: Partial<UserSession & { password?: string }>): Promise<UserSession> => {
     if (!user) throw new Error("No authenticated user");
     
     // Create mapping to profile shape
@@ -276,8 +291,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       ...(updates.name && { name: updates.name }),
       ...(updates.avatar_url && { avatar_url: updates.avatar_url }),
       ...(updates.role && { role: updates.role }),
-      ...(updates.password !== undefined && { password: updates.password }),
+      ...(updates.bio !== undefined && { bio: updates.bio }),
+      ...(updates.password && { password: updates.password }),
     };
+
+    if (isLive && supabaseClient && updates.password) {
+      const { error } = await supabaseClient.auth.updateUser({ password: updates.password });
+      if (error) throw error;
+    }
 
     const updatedProfile = await actionUpdateProfile(user.id, profileUpdates);
     const updatedSessionUser: UserSession = {
@@ -286,13 +307,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       email: updatedProfile.email,
       avatar_url: updatedProfile.avatar_url,
       role: updatedProfile.role,
+      bio: updatedProfile.bio || "",
     };
     setUser(updatedSessionUser);
     return updatedSessionUser;
   };
 
+  const deleteAccount = async (): Promise<void> => {
+    if (!user) throw new Error("No authenticated user");
+    setLoading(true);
+    try {
+      await actionDeleteProfile(user.id);
+      if (isLive && supabaseClient) {
+        await supabaseClient.auth.signOut();
+      } else {
+        localStorage.removeItem("openpages_session_user_id");
+      }
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, isLive, login, register, logout, updateUser }}>
+    <AuthContext.Provider value={{ user, loading, isLive, login, register, logout, updateUser, deleteAccount }}>
       {children}
     </AuthContext.Provider>
   );
