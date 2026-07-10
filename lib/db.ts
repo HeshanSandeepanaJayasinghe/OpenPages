@@ -24,6 +24,7 @@ export interface Profile {
   email: string;
   avatar_url: string;
   role: "writer" | "admin";
+  password?: string;
   created_at: string;
   bio?: string;
   password?: string;
@@ -81,7 +82,6 @@ const INITIAL_MOCK_DATA: MockDataSchema = {
       email: "writer@openpages.com",
       avatar_url: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150",
       role: "writer",
-      bio: "A passionate writer exploring the bounds of physical and digital print.",
       password: "writer123",
       created_at: new Date("2026-06-02T10:00:00Z").toISOString(),
     },
@@ -91,7 +91,6 @@ const INITIAL_MOCK_DATA: MockDataSchema = {
       email: "writer2@openpages.com",
       avatar_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
       role: "writer",
-      bio: "Savoring the quiet details of books and marginalia.",
       password: "writer123",
       created_at: new Date("2026-06-03T14:30:00Z").toISOString(),
     },

@@ -159,7 +159,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           throw new Error("Invalid email or password");
         }
 
-        // Simulating password validation (any matching mock user accepts their demo password or writer123 / admin123)
+        const storedPassword = profile.password;
+        const isStoredPasswordMatch = storedPassword ? password === storedPassword : false;
         const isDemoAdmin = email === "admin@openpages.com" && password === "admin123";
         const isDemoWriter = email === "writer@openpages.com" && password === "writer123";
         const isDemoWriter2 = email === "writer2@openpages.com" && password === "writer123";
@@ -245,6 +246,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           email,
           avatar_url: `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(name)}`,
           role,
+          password,
           created_at: new Date().toISOString(),
           bio: "",
           password,
