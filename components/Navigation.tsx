@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth";
-import { BookOpen, User, LogOut, Shield, Feather, Settings, Database, DatabaseZap } from "lucide-react";
+import { BookOpen, User, LogOut, Shield, Feather, Settings, Database, DatabaseZap, LayoutDashboard } from "lucide-react";
 
 export function Header() {
   const { user, logout, isLive } = useAuth();
@@ -124,6 +124,17 @@ export function Header() {
                       >
                         <User size={13} />
                         My Profile
+                      </Link>
+                      <Link 
+                        href="/admin" 
+                        className={`flex items-center gap-1.5 py-1 px-2.5 rounded border ${
+                          isActive("/admin") 
+                            ? "bg-accent-ink/5 border-accent-ink/20 text-accent-ink" 
+                            : "border-transparent text-ink-gray hover:text-ink hover:bg-black/5"
+                        }`}
+                      >
+                        <LayoutDashboard size={13} />
+                        Dashboard
                       </Link>
                       <Link 
                         href="/stat" 
@@ -254,6 +265,14 @@ export function Header() {
                     }`}
                   >
                     Profile
+                  </Link>
+                  <Link 
+                    href="/admin" 
+                    className={`flex items-center gap-1 ${
+                      isActive("/admin") ? "text-accent-ink font-semibold" : "text-ink-gray hover:text-ink"
+                    }`}
+                  >
+                    Dashboard
                   </Link>
                   <Link 
                     href="/stat" 
