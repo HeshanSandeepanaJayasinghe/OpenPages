@@ -313,7 +313,7 @@ export function Footer() {
           <div className="flex gap-4">
             <Link href="/" className="hover:text-ink transition-colors">Home</Link>
             <Link href="/pages" className="hover:text-ink transition-colors">Pages</Link>
-            <Link href="/about" className="hover:text-ink transition-colors">About</Link>
+            <Link href="/aboutus" className="hover:text-ink transition-colors">About Us</Link>
           </div>
           <p className="text-[11px]">
             &copy; {new Date().getFullYear()} OpenPages. Crafted with a mat paper aesthetic.
